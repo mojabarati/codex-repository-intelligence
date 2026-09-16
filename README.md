@@ -1,96 +1,218 @@
 # Codex Repository Intelligence & Self-Evolving Skills
 
-A repository-specific setup prompt for turning project context, engineering conventions, security constraints, and operational knowledge into persistent guidance for Codex.
+[![skills.sh](https://skills.sh/b/mojabarati/codex-repository-intelligence)](https://skills.sh/mojabarati/codex-repository-intelligence)
 
-Instead of repeatedly re-explaining architecture and project rules in every task, the setup asks Codex to inspect the **actual repository** and create a compact, version-controlled context system using:
+Turn recurring project context into persistent, version-controlled repository intelligence for Codex and other Agent Skills-compatible coding agents.
 
-- `AGENTS.md` for repository-wide guidance and rules
+Instead of repeatedly re-explaining architecture, conventions, security constraints, testing expectations, and production risks in every AI-assisted development session, this project provides an installable Agent Skill that teaches an agent how to inspect the **actual repository** and establish a repository-specific context system using:
+
+- `AGENTS.md` for concise repository-wide guidance and rules
 - `.agents/skills/<skill-name>/SKILL.md` for project-specific engineering playbooks
-- a **Skill Evolution** mechanism that updates or creates Skills when future tasks reveal stable, reusable repository knowledge
+- a **Skill Evolution** mechanism that updates, creates, consolidates, or removes Skills when future work reveals stable reusable repository knowledge
 
-> The goal is not to make the repository accumulate generic AI instructions. The goal is to keep a small, evidence-based context layer synchronized with the codebase.
+> The goal is not to accumulate generic AI instructions. The goal is to keep a small, evidence-based context layer synchronized with the codebase.
 
-## What the setup covers
+## Install as an Agent Skill
 
-The prompt instructs Codex to inspect the repository before creating guidance, including relevant areas such as:
+Install directly from GitHub with the Skills CLI:
 
-- project structure and technology stack
-- frontend and UI/design-system patterns
-- backend and API conventions
-- database and data-integrity patterns
-- testing and validation commands
-- production-sensitive areas
-- authentication, authorization, permissions, uploads, webhooks, secrets, and other security boundaries
+```bash
+npx skills add mojabarati/codex-repository-intelligence
+```
 
-It then creates only the repository-local Skills that are justified by the codebase.
+If the CLI discovers multiple skills and you want to select this one explicitly:
 
-## Self-Evolving Skills
+```bash
+npx skills add https://github.com/mojabarati/codex-repository-intelligence --skill codex-repository-intelligence
+```
 
-For substantial future tasks, Codex is instructed to:
+The installable skill lives at:
+
+```text
+skills/codex-repository-intelligence/SKILL.md
+```
+
+## What the Skill does
+
+When used on an existing software repository, the Skill guides the agent to:
+
+1. verify the repository root and scope;
+2. inspect the actual architecture, stack, conventions, tests, data layer, security boundaries, and production-sensitive areas;
+3. create or update a concise root `AGENTS.md`;
+4. discover only the repository-local Skills that are genuinely justified by evidence;
+5. make each generated Skill an actionable engineering playbook rather than generic documentation;
+6. establish mandatory Skill selection for future substantial tasks;
+7. establish a controlled Skill Evolution mechanism;
+8. prevent Skill bloat and unsupported permanent rules;
+9. protect major architectural, security, product, and data decisions from being silently established through Skill Evolution;
+10. validate the generated guidance against the real repository before completion.
+
+## Expected output in the target repository
+
+A typical result looks like:
+
+```text
+AGENTS.md
+.agents/
+└── skills/
+    ├── frontend-development/
+    │   └── SKILL.md
+    ├── backend-development/
+    │   └── SKILL.md
+    ├── testing/
+    │   └── SKILL.md
+    └── ...
+```
+
+The exact Skills are **not predefined**. They should be derived from the target repository.
+
+## Skill Evolution
+
+For substantial future tasks, the generated repository guidance instructs the agent to:
 
 1. inspect available repository Skills;
 2. select the Skills relevant to the task;
 3. identify reusable project knowledge that is missing or outdated;
 4. update an existing Skill when the knowledge belongs there;
 5. create a new Skill only when a meaningful recurring domain is not adequately covered;
-6. avoid Skill changes for temporary, trivial, speculative, or one-off knowledge;
-7. keep Skill changes reviewable and report them explicitly.
+6. consolidate or remove obsolete guidance when needed;
+7. make no Skill change for temporary, trivial, speculative, or one-off knowledge;
+8. report Skill changes explicitly.
 
-The prompt also includes safeguards against Skill bloat and against silently turning task-level decisions into permanent architecture or product rules.
+This creates a lifecycle like:
+
+```text
+Repository evolves
+        ↓
+Agent discovers verified reusable patterns
+        ↓
+Relevant Skills evolve
+        ↓
+Future tasks receive better project-specific context
+```
 
 ## Security and production safety
 
-Security is explicitly evaluated during setup. A dedicated Security Skill is created only when the repository's real attack surface justifies one.
+Security is explicitly evaluated during setup. A dedicated Security Skill is created only when the repository's actual attack surface justifies one.
 
-The same applies to Production Safety. Security and Production Safety are treated as different concerns and are separated when the repository benefits from that distinction.
+Production Safety is evaluated separately. Depending on the repository, this may cover areas such as:
 
-The setup itself is analysis/guidance-only: it instructs Codex **not** to implement product features, modify application behavior, run destructive migrations, change production configuration, or expose secrets during the initial setup.
+- migrations and production data
+- backwards compatibility
+- authentication and authorization
+- payments and billing
+- webhooks and external integrations
+- queues and background jobs
+- infrastructure and deployment
+- secrets and environment configuration
+- irreversible or destructive operations
 
-## How to use it
+Security and Production Safety are kept separate when doing so improves clarity and future correctness.
 
-### 1. Start from the repository root
+## Setup safety boundary
 
-Open a **new Codex chat/session** from the root of the existing project you want to configure.
+The initial setup is intentionally analysis/guidance-only. It should **not** be used to:
 
-### 2. Run the setup prompt
+- implement product features
+- fix unrelated bugs
+- refactor application code
+- upgrade dependencies
+- change application behavior
+- modify database data
+- run destructive migrations
+- change production configuration or infrastructure
+- rotate credentials
+- expose secrets
 
-Copy the full contents of [`PROMPT.md`](./PROMPT.md) into that new session and let Codex complete the repository analysis and guidance setup.
+Important findings can be reported, but they should not be silently fixed during the setup pass.
 
-Expected repository-local output will typically include:
+## Evidence over assumptions
+
+Persistent repository guidance should be based on strong evidence such as:
+
+1. explicit current project documentation or approved decisions;
+2. enforced configuration or schema constraints;
+3. executable tests and validation;
+4. repeated consistent implementations;
+5. a single implementation only when it is clearly intentional.
+
+Weak or contradictory evidence should be marked uncertain rather than promoted into a permanent rule.
+
+## Why this exists
+
+In AI-assisted development, a seemingly simple task like:
+
+> “Add this feature.”
+
+may depend on hidden context such as:
+
+- this API must remain backwards compatible;
+- this component must reuse the design system;
+- this endpoint requires a specific permission check;
+- this migration affects production data;
+- this flow requires particular tests;
+- this webhook must preserve idempotency;
+- this subsystem has established failure-handling patterns.
+
+As a product grows, this context grows too.
+
+This project treats that as a **Context Architecture** problem: part of the knowledge required to work safely on the codebase should live with the codebase itself.
+
+## Repository structure
 
 ```text
-AGENTS.md
-.agents/
+codex-repository-intelligence/
+├── README.md
+├── PROMPT.md
 └── skills/
-    ├── <skill-name>/
-    │   └── SKILL.md
-    └── ...
+    └── codex-repository-intelligence/
+        └── SKILL.md
 ```
 
-The exact Skills should be determined from the repository rather than from a fixed list.
+### `SKILL.md`
 
-### 3. Start a fresh session for normal work
+The installable Agent Skill. It contains the operational workflow, safety constraints, Skill Evolution logic, evidence rules, and validation requirements.
 
-After the initial setup finishes, open a **new session** from the same repository root and continue with normal feature, bug-fix, refactor, or maintenance tasks.
+### `PROMPT.md`
 
-For substantial tasks, the generated `AGENTS.md` should instruct Codex to inspect and use the relevant repository Skills before implementation, then evaluate whether those Skills should evolve based on verified reusable knowledge discovered during the task.
+The original long-form setup prompt. It is retained for transparency, human review, direct-session usage, and comparison with the packaged Skill.
 
-## Important design principles
+## Direct prompt usage
+
+You can still use the original workflow without installing the Skill:
+
+1. open a new Codex session from the root of the existing project;
+2. copy the full contents of [`PROMPT.md`](./PROMPT.md) into the session;
+3. let the initial repository analysis/setup finish;
+4. open a fresh session from the same repository root for normal development work.
+
+## Design principles
 
 - Repository evidence over assumptions
 - Project-specific Skills over generic personas
 - Small, high-value Skill set over Skill proliferation
-- Security invariants can justify persistent guidance even when discovered once
+- Security invariants may justify persistent guidance even when discovered once
 - Skills document established decisions; they should not silently create governance decisions
 - Persistent context should remain concise enough to be useful as agent context
 - `AGENTS.md` and Skills should remain version-controlled and reviewable
+- Skill changes should be transparent
 
-## Full prompt
+## skills.sh
 
-The complete setup prompt is available here:
+The repository is structured as an Agent Skill source and can be installed with the Skills CLI:
+
+```bash
+npx skills add mojabarati/codex-repository-intelligence
+```
+
+Once the Skill is installed through the CLI, skills.sh can discover and track it through its anonymous installation telemetry.
+
+## Full long-form prompt
+
+For the original detailed setup specification, see:
 
 **[PROMPT.md](./PROMPT.md)**
 
 ## Notes
 
-This is an opinionated workflow for AI-assisted software development. It is intended to reduce repeated context transfer and improve consistency, but the generated guidance still needs normal engineering review. Repository instructions should evolve from verified project evidence, not from assumptions or accidental implementation patterns.
+This is an opinionated workflow for AI-assisted software development. Generated guidance still requires normal engineering review. Repository instructions should evolve from verified project evidence, not assumptions, temporary implementation details, or accidental patterns.
