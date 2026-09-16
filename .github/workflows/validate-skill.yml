@@ -1,0 +1,52 @@
+name: Validate Agent Skill
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Discover skills
+        run: npx --yes skills add . --list
+
+      - name: Install skill into a temporary validation project
+        shell: bash
+        run: |
+          set -euo pipefail
+          tmp_dir="$(mktemp -d)"
+          cp -R . "$tmp_dir/source"
+          mkdir -p "$tmp_dir/target"
+          cd "$tmp_dir/target"
+          git init -q
+          npx --yes skills add "$tmp_dir/source" \
+            --skill codex-repository-intelligence \
+            --agent codex \
+            --copy \
+            --yes
+
+          test -f .agents/skills/codex-repository-intelligence/SKILL.md
+          test -f .agents/skills/codex-repository-intelligence/references/setup-prompt.md
+
+      - name: Validate required frontmatter
+        shell: bash
+        run: |
+          set -euo pipefail
+          skill="skills/codex-repository-intelligence/SKILL.md"
+          grep -q '^---$' "$skill"
+          grep -q '^name: codex-repository-intelligence$' "$skill"
+          grep -q '^description: ' "$skill"
