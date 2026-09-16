@@ -21,19 +21,23 @@ jobs:
         with:
           node-version: 22
 
-      - name: Discover skills
-        run: npx --yes skills add . --list
+      - name: Discover skills from GitHub source
+        run: |
+          npx --yes skills add \
+            https://github.com/mojabarati/codex-repository-intelligence \
+            --list
 
-      - name: Install skill into a temporary validation project
+      - name: Install skill from GitHub source into a temporary validation project
         shell: bash
         run: |
           set -euo pipefail
           tmp_dir="$(mktemp -d)"
-          cp -R . "$tmp_dir/source"
           mkdir -p "$tmp_dir/target"
           cd "$tmp_dir/target"
           git init -q
-          npx --yes skills add "$tmp_dir/source" \
+
+          npx --yes skills add \
+            https://github.com/mojabarati/codex-repository-intelligence \
             --skill codex-repository-intelligence \
             --agent codex \
             --copy \
